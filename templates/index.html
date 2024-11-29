@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/static/style.css">
+    <title>Editor de PDF</title>
+</head>
+<body>
+    <h1>Editor de PDF</h1>
+    <form action="/eliminar" method="post" enctype="multipart/form-data">
+        <h2>Eliminar Página</h2>
+        <input type="file" name="pdf_file" accept="application/pdf" required>
+        <input type="number" name="page" placeholder="Página a eliminar" required>
+        <button type="submit">Eliminar Página</button>
+    </form>
+
+    <form action="/agregar" method="post" enctype="multipart/form-data">
+        <h2>Agregar Página</h2>
+        <label>Archivo Principal:</label>
+        <input type="file" name="main_pdf" accept="application/pdf" required>
+        <label>Archivo Adicional:</label>
+        <input type="file" name="additional_pdf" accept="application/pdf" required>
+        <button type="submit">Agregar Página</button>
+    </form>
+</body>
+</html>
