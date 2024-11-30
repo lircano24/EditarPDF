@@ -75,6 +75,7 @@ def reemplazar():
         main_file = request.files['main_pdf']
         replacement_file = request.files['replacement_pdf']
         page_to_replace = int(request.form['page']) - 1  # Página a reemplazar (indexada desde 0)
+        replacement_pages = request.form['replacement_pages']  # Páginas seleccionadas
 
         main_path = os.path.join(UPLOAD_FOLDER, main_file.filename)
         replacement_path = os.path.join(UPLOAD_FOLDER, replacement_file.filename)
@@ -87,10 +88,15 @@ def reemplazar():
 
         writer = PdfWriter()
 
-        # Reemplazar la página en el archivo principal
+        # Procesar las páginas seleccionadas
+        selected_pages = [int(p) - 1 for p in replacement_pages.split(",") if p.isdigit()]
+
+        # Reemplazar la página en el archivo principal con las páginas seleccionadas
         for i in range(len(main_reader.pages)):
             if i == page_to_replace:
-                writer.add_page(replacement_reader.pages[0])  # Agrega la primera página del archivo de reemplazo
+                for page_index in selected_pages:
+                    if 0 <= page_index < len(replacement_reader.pages):
+                        writer.add_page(replacement_reader.pages[page_index])
             else:
                 writer.add_page(main_reader.pages[i])
 
@@ -104,6 +110,36 @@ def reemplazar():
     except Exception as e:
         return f"Error: {e}"
 
+''' 
+@app.route('/detalles_pdf', methods=['POST'])
+def detalles_pdf():
+    try:
+        # Guardar el archivo subido temporalmente
+        pdf_file = request.files['pdf_file']
+        temp_path = os.path.join(UPLOAD_FOLDER, pdf_file.filename)
+        pdf_file.save(temp_path)
+
+        # Leer el PDF y contar las páginas
+        reader = PdfReader(temp_path)
+        num_pages = len(reader.pages)
+
+        # Devolver la cantidad de páginas
+        return {"num_pages": num_pages}, 200
+
+    except Exception as e:
+        return {"error": str(e)}, 500
+    
+'''
+
+@app.route('/detalles_pdf', methods=['POST'])
+def detalles_pdf():
+    try:
+        file = request.files['pdf_file']
+        reader = PdfReader(file)
+        num_pages = len(reader.pages)
+        return {'num_pages': num_pages}
+    except Exception as e:
+        return {'error': str(e)}
 
 if __name__ == '__main__':
     app.run(debug=True)

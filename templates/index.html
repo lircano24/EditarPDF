@@ -3,37 +3,123 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="/static/style.css">
     <title>Editor de PDF</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
-<body>
-    <h1>Editor de PDF</h1>
-    <form action="/eliminar" method="post" enctype="multipart/form-data">
-        <h2>Eliminar Página</h2>
-        <input type="file" name="pdf_file" accept="application/pdf" required>
-        <input type="number" name="page" placeholder="Página a eliminar" required>
-        <button type="submit">Eliminar Página</button>
-    </form>
+<body class="bg-light">
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">PDF Editor</a>
+        </div>
+    </nav>
 
-    <form action="/agregar" method="post" enctype="multipart/form-data">
-        <h2>Agregar Página</h2>
-        <label>Archivo Principal:</label>
-        <input type="file" name="main_pdf" accept="application/pdf" required>
-        <label>Archivo Adicional:</label>
-        <input type="file" name="additional_pdf" accept="application/pdf" required>
-        <button type="submit">Agregar Página</button>
-    </form>
-    <form action="/reemplazar" method="post" enctype="multipart/form-data">
-        <label for="main_pdf">Archivo principal:</label>
-        <input type="file" name="main_pdf" required>
-        <br>
-        <label for="replacement_pdf">Archivo de reemplazo:</label>
-        <input type="file" name="replacement_pdf" required>
-        <br>
-        <label for="page">Número de página a reemplazar:</label>
-        <input type="number" name="page" min="1" required>
-        <br>
-        <button type="submit">Reemplazar página</button>
-    </form>
+    <!-- Main Container -->
+    <div class="container mt-5">
+        <h1 class="text-center mb-4">Editor de PDF</h1>
+        <form id="reemplazar-form" action="/reemplazar" method="post" enctype="multipart/form-data" class="needs-validation" novalidate>
+            <!-- Archivo principal -->
+            <div class="mb-3">
+                <label for="main_pdf" class="form-label">Archivo principal</label>
+                <input type="file" class="form-control" id="main_pdf" name="main_pdf" required>
+                <div class="form-text" id="main_pdf_info"></div>
+                <div class="invalid-feedback">Por favor, selecciona un archivo PDF válido.</div>
+            </div>
+            <!-- Archivo de reemplazo -->
+            <div class="mb-3">
+                <label for="replacement_pdf" class="form-label">Archivo de reemplazo</label>
+                <input type="file" class="form-control" id="replacement_pdf" name="replacement_pdf" required>
+                <div class="form-text" id="replacement_pdf_info"></div>
+                <div class="invalid-feedback">Por favor, selecciona un archivo PDF válido.</div>
+            </div>
+            <!-- Número de página a reemplazar -->
+            <div class="mb-3">
+                <label for="page" class="form-label">Número de página a reemplazar</label>
+                <input type="number" class="form-control" id="page" name="page" min="1" required>
+                <div class="invalid-feedback">Ingresa un número de página válido.</div>
+            </div>
+            <!-- Páginas del archivo de reemplazo -->
+            <div class="mb-3">
+                <label for="replacement_pages" class="form-label">Páginas del archivo de reemplazo (ej. 1,3,5)</label>
+                <input type="text" class="form-control" id="replacement_pages" name="replacement_pages">
+                <div class="form-text">Deja en blanco para usar todas las páginas del archivo de reemplazo.</div>
+            </div>
+            <!-- Botón -->
+            <button type="submit" class="btn btn-primary">Reemplazar página</button>
+        </form>
+    </div>
+
+    <!-- Footer -->
+    <footer class="text-center mt-5">
+        <p class="text-muted">© 2024 LPPPDF Editor. Todos los derechos reservados.</p>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- JavaScript para validación -->
+    <script>
+        const mainPdfInput = document.getElementById('main_pdf');
+        const replacementPdfInput = document.getElementById('replacement_pdf');
+        const pageInput = document.getElementById('page');
+        const replacementPagesInput = document.getElementById('replacement_pages');
+
+        let mainPdfPages = 0;
+        let replacementPdfPages = 0;
+
+        // Solicitar detalles de los PDFs
+        async function getPdfPages(input, infoId) {
+            const file = input.files[0];
+            if (!file) return 0;
+
+            const formData = new FormData();
+            formData.append('pdf_file', file);
+
+            const response = await fetch('/detalles_pdf', {
+                method: 'POST',
+                body: formData
+            });
+
+            const data = await response.json();
+            const numPages = data.num_pages || 0;
+
+            document.getElementById(infoId).textContent = `El archivo tiene ${numPages} páginas.`;
+            return numPages;
+        }
+
+        // Actualizar número de páginas al cargar archivos
+        mainPdfInput.addEventListener('change', async () => {
+            mainPdfPages = await getPdfPages(mainPdfInput, 'main_pdf_info');
+        });
+
+        replacementPdfInput.addEventListener('change', async () => {
+            replacementPdfPages = await getPdfPages(replacementPdfInput, 'replacement_pdf_info');
+        });
+
+        // Validar formulario antes de enviarlo
+        document.getElementById('reemplazar-form').addEventListener('submit', function (event) {
+            const pageToReplace = parseInt(pageInput.value);
+            const replacementPages = replacementPagesInput.value.split(',').map(Number);
+
+            let valid = true;
+
+            // Validar número de página a reemplazar
+            if (pageToReplace < 1 || pageToReplace > mainPdfPages) {
+                valid = false;
+                alert(`La página a reemplazar debe estar entre 1 y ${mainPdfPages}.`);
+            }
+
+            // Validar páginas de reemplazo
+            if (replacementPages.some(page => page < 1 || page > replacementPdfPages)) {
+                valid = false;
+                alert(`Las páginas del archivo de reemplazo deben estar entre 1 y ${replacementPdfPages}.`);
+            }
+
+            if (!valid) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+        });
+    </script>
 </body>
 </html>
