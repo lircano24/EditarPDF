@@ -18,108 +18,96 @@
     <!-- Main Container -->
     <div class="container mt-5">
         <h1 class="text-center mb-4">Editor de PDF</h1>
-        <form id="reemplazar-form" action="/reemplazar" method="post" enctype="multipart/form-data" class="needs-validation" novalidate>
-            <!-- Archivo principal -->
-            <div class="mb-3">
-                <label for="main_pdf" class="form-label">Archivo principal</label>
-                <input type="file" class="form-control" id="main_pdf" name="main_pdf" required>
-                <div class="form-text" id="main_pdf_info"></div>
-                <div class="invalid-feedback">Por favor, selecciona un archivo PDF válido.</div>
+
+        <!-- Tabs -->
+        <ul class="nav nav-tabs" id="editorTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="reemplazar-tab" data-bs-toggle="tab" data-bs-target="#reemplazar" type="button" role="tab" aria-controls="reemplazar" aria-selected="true">Reemplazar Página</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="eliminar-tab" data-bs-toggle="tab" data-bs-target="#eliminar" type="button" role="tab" aria-controls="eliminar" aria-selected="false">Eliminar Página</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="agregar-tab" data-bs-toggle="tab" data-bs-target="#agregar" type="button" role="tab" aria-controls="agregar" aria-selected="false">Agregar Página</button>
+            </li>
+        </ul>
+
+        <!-- Tab Content -->
+        <div class="tab-content mt-4" id="editorTabsContent">
+            <!-- Reemplazar Página -->
+            <div class="tab-pane fade show active" id="reemplazar" role="tabpanel" aria-labelledby="reemplazar-tab">
+                <form id="reemplazar-form" action="/reemplazar" method="post" enctype="multipart/form-data" class="needs-validation" novalidate>
+                    <div class="mb-3">
+                        <label for="main_pdf" class="form-label">Archivo principal</label>
+                        <input type="file" class="form-control" id="main_pdf" name="main_pdf" required>
+                        <div class="form-text" id="main_pdf_info"></div>
+                        <div class="invalid-feedback">Por favor, selecciona un archivo PDF válido.</div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="replacement_pdf" class="form-label">Archivo de reemplazo</label>
+                        <input type="file" class="form-control" id="replacement_pdf" name="replacement_pdf" required>
+                        <div class="form-text" id="replacement_pdf_info"></div>
+                        <div class="invalid-feedback">Por favor, selecciona un archivo PDF válido.</div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="page" class="form-label">Número de página a reemplazar</label>
+                        <input type="number" class="form-control" id="page" name="page" min="1" required>
+                        <div class="invalid-feedback">Ingresa un número de página válido.</div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="replacement_pages" class="form-label">Páginas del archivo de reemplazo (ej. 1,3,5)</label>
+                        <input type="text" class="form-control" id="replacement_pages" name="replacement_pages">
+                        <div class="form-text">Deja en blanco para usar todas las páginas del archivo de reemplazo.</div>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Reemplazar página</button>
+                </form>
             </div>
-            <!-- Archivo de reemplazo -->
-            <div class="mb-3">
-                <label for="replacement_pdf" class="form-label">Archivo de reemplazo</label>
-                <input type="file" class="form-control" id="replacement_pdf" name="replacement_pdf" required>
-                <div class="form-text" id="replacement_pdf_info"></div>
-                <div class="invalid-feedback">Por favor, selecciona un archivo PDF válido.</div>
+
+            <!-- Eliminar Página -->
+            <div class="tab-pane fade" id="eliminar" role="tabpanel" aria-labelledby="eliminar-tab">
+                <form id="eliminar-form" action="/eliminar" method="post" enctype="multipart/form-data" class="needs-validation" novalidate>
+                    <div class="mb-3">
+                        <label for="delete_pdf" class="form-label">Archivo PDF</label>
+                        <input type="file" class="form-control" id="delete_pdf" name="pdf_file" required>
+                        <div class="form-text" id="delete_pdf_info"></div>
+                        <div class="invalid-feedback">Por favor, selecciona un archivo PDF válido.</div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="delete_page" class="form-label">Número de página a eliminar</label>
+                        <input type="number" class="form-control" id="delete_page" name="page" min="1" required>
+                        <div class="invalid-feedback">Ingresa un número de página válido.</div>
+                    </div>
+                    <button type="submit" class="btn btn-danger">Eliminar página</button>
+                </form>
             </div>
-            <!-- Número de página a reemplazar -->
-            <div class="mb-3">
-                <label for="page" class="form-label">Número de página a reemplazar</label>
-                <input type="number" class="form-control" id="page" name="page" min="1" required>
-                <div class="invalid-feedback">Ingresa un número de página válido.</div>
+
+            <!-- Agregar Página -->
+            <div class="tab-pane fade" id="agregar" role="tabpanel" aria-labelledby="agregar-tab">
+                <form id="agregar-form" action="/agregar" method="post" enctype="multipart/form-data" class="needs-validation" novalidate>
+                    <div class="mb-3">
+                        <label for="main_add_pdf" class="form-label">Archivo principal</label>
+                        <input type="file" class="form-control" id="main_add_pdf" name="main_pdf" required>
+                        <div class="form-text" id="main_add_pdf_info"></div>
+                        <div class="invalid-feedback">Por favor, selecciona un archivo PDF válido.</div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="additional_pdf" class="form-label">Archivo adicional</label>
+                        <input type="file" class="form-control" id="additional_pdf" name="additional_pdf" required>
+                        <div class="form-text" id="additional_pdf_info"></div>
+                        <div class="invalid-feedback">Por favor, selecciona un archivo PDF válido.</div>
+                    </div>
+                    <button type="submit" class="btn btn-success">Agregar página</button>
+                </form>
             </div>
-            <!-- Páginas del archivo de reemplazo -->
-            <div class="mb-3">
-                <label for="replacement_pages" class="form-label">Páginas del archivo de reemplazo (ej. 1,3,5)</label>
-                <input type="text" class="form-control" id="replacement_pages" name="replacement_pages">
-                <div class="form-text">Deja en blanco para usar todas las páginas del archivo de reemplazo.</div>
-            </div>
-            <!-- Botón -->
-            <button type="submit" class="btn btn-primary">Reemplazar página</button>
-        </form>
+        </div>
     </div>
 
     <!-- Footer -->
     <footer class="text-center mt-5">
-        <p class="text-muted">© 2024 LPPPDF Editor. Todos los derechos reservados.</p>
+        <p class="text-muted">© 2024 LPP PDF Editor. Todos los derechos reservados.</p>
     </footer>
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <!-- JavaScript para validación -->
-    <script>
-        const mainPdfInput = document.getElementById('main_pdf');
-        const replacementPdfInput = document.getElementById('replacement_pdf');
-        const pageInput = document.getElementById('page');
-        const replacementPagesInput = document.getElementById('replacement_pages');
-
-        let mainPdfPages = 0;
-        let replacementPdfPages = 0;
-
-        // Solicitar detalles de los PDFs
-        async function getPdfPages(input, infoId) {
-            const file = input.files[0];
-            if (!file) return 0;
-
-            const formData = new FormData();
-            formData.append('pdf_file', file);
-
-            const response = await fetch('/detalles_pdf', {
-                method: 'POST',
-                body: formData
-            });
-
-            const data = await response.json();
-            const numPages = data.num_pages || 0;
-
-            document.getElementById(infoId).textContent = `El archivo tiene ${numPages} páginas.`;
-            return numPages;
-        }
-
-        // Actualizar número de páginas al cargar archivos
-        mainPdfInput.addEventListener('change', async () => {
-            mainPdfPages = await getPdfPages(mainPdfInput, 'main_pdf_info');
-        });
-
-        replacementPdfInput.addEventListener('change', async () => {
-            replacementPdfPages = await getPdfPages(replacementPdfInput, 'replacement_pdf_info');
-        });
-
-        // Validar formulario antes de enviarlo
-        document.getElementById('reemplazar-form').addEventListener('submit', function (event) {
-            const pageToReplace = parseInt(pageInput.value);
-            const replacementPages = replacementPagesInput.value.split(',').map(Number);
-
-            let valid = true;
-
-            // Validar número de página a reemplazar
-            if (pageToReplace < 1 || pageToReplace > mainPdfPages) {
-                valid = false;
-                alert(`La página a reemplazar debe estar entre 1 y ${mainPdfPages}.`);
-            }
-
-            // Validar páginas de reemplazo
-            if (replacementPages.some(page => page < 1 || page > replacementPdfPages)) {
-                valid = false;
-                alert(`Las páginas del archivo de reemplazo deben estar entre 1 y ${replacementPdfPages}.`);
-            }
-
-            if (!valid) {
-                event.preventDefault();
-                event.stopPropagation();
-            }
-        });
-    </script>
 </body>
 </html>
