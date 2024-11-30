@@ -66,6 +66,44 @@ def agregar():
 
     except Exception as e:
         return f"Error: {e}"
+    
+
+@app.route('/reemplazar', methods=['POST'])
+def reemplazar():
+    try:
+        # Guardar los archivos cargados
+        main_file = request.files['main_pdf']
+        replacement_file = request.files['replacement_pdf']
+        page_to_replace = int(request.form['page']) - 1  # Página a reemplazar (indexada desde 0)
+
+        main_path = os.path.join(UPLOAD_FOLDER, main_file.filename)
+        replacement_path = os.path.join(UPLOAD_FOLDER, replacement_file.filename)
+        main_file.save(main_path)
+        replacement_file.save(replacement_path)
+
+        # Leer los archivos PDF
+        main_reader = PdfReader(main_path)
+        replacement_reader = PdfReader(replacement_path)
+
+        writer = PdfWriter()
+
+        # Reemplazar la página en el archivo principal
+        for i in range(len(main_reader.pages)):
+            if i == page_to_replace:
+                writer.add_page(replacement_reader.pages[0])  # Agrega la primera página del archivo de reemplazo
+            else:
+                writer.add_page(main_reader.pages[i])
+
+        # Guardar el archivo modificado
+        output_path = os.path.join(UPLOAD_FOLDER, f"modificado_{main_file.filename}")
+        with open(output_path, "wb") as output_pdf:
+            writer.write(output_pdf)
+
+        return send_file(output_path, as_attachment=True)
+
+    except Exception as e:
+        return f"Error: {e}"
+
 
 if __name__ == '__main__':
     app.run(debug=True)

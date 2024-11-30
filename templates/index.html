@@ -23,5 +23,17 @@
         <input type="file" name="additional_pdf" accept="application/pdf" required>
         <button type="submit">Agregar Página</button>
     </form>
+    <form action="/reemplazar" method="post" enctype="multipart/form-data">
+        <label for="main_pdf">Archivo principal:</label>
+        <input type="file" name="main_pdf" required>
+        <br>
+        <label for="replacement_pdf">Archivo de reemplazo:</label>
+        <input type="file" name="replacement_pdf" required>
+        <br>
+        <label for="page">Número de página a reemplazar:</label>
+        <input type="number" name="page" min="1" required>
+        <br>
+        <button type="submit">Reemplazar página</button>
+    </form>
 </body>
 </html>
